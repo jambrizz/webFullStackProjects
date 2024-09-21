@@ -1,58 +1,67 @@
-//import { useState } from 'react'
-//import reactLogo from './assets/react.svg'
-//import viteLogo from '/vite.svg'
+import { useEffect, useState } from 'react'
+import { NewTodoForm } from './NewTodoForm'
 import './App.css'
+import { TodoList } from './TodoList'
+
 
 //This is the main component of the app
 function App() {
-  //const [count, setCount] = useState(0)
+
+    //useState will be used to store the list of todos
+    const [todos, setTodos] = useState(() => {
+        const localValue = localStorage.getItem("ITEMS")
+        if (localValue == null) return []
+
+        return JSON.parse(localValue)
+    })
+
+    useEffect(() => {
+        localStorage.setItem("ITEMS", JSON.stringify(todos))
+    }, [todos])
+
+    function addTodo(title) {
+        setTodos((currentTodos) => {
+            return [
+                ...currentTodos,
+                {
+                    id: crypto.randomUUID(),
+                    title,
+                    completed: false
+                },
+            ]
+        })
+    }
+
+    function toggleTodo(id, completed) {
+        setTodos((currentTodos) => {
+            return currentTodos.map(todo => {
+                //If the todo id is the same as the id passed to the function
+                if (todo.id === id) {
+                    return {
+                        ...todo,
+                        completed
+                    }
+                }
+                //Otherwise, return the todo as is
+                return todo
+            })
+        })
+    }
+
+    function deleteTodo(id) {
+        setTodos((currentTodos) => {
+            return currentTodos.filter(todo => todo.id !== id)
+        })
+    }
 
     return (
         // <> is a fragment, it allows to return multiple elements
         <>
-            <form className="new-item-form">
-                <div className="form-row">
-                    <label htmlFor="new-todo-input">New ToDo Item</label>
-                    <input type="text" id="new-todo-input" name="new-todo-input" />
-                </div>
-                <button className="btn"/*type="submit"*/>Add Item</button>
-            </form>
+            <NewTodoForm onSubmit={addTodo} />
             <h1 className="header">ToDo List</h1>
-            <ul className="list">
-                <li>
-                    <label>
-                        <input type="checkbox" />
-                        Item 1
-                    </label>
-                    <button className="btn btn-danger">Delete</button>
-                    <button className="btn btn-warning">Edit</button>
-                </li>
-            </ul>
+            <TodoList todos={todos} toggleTodo={toggleTodo} deleteTodo={deleteTodo} />
         </>
-      /*
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-    */
+      
   )
 }
 
