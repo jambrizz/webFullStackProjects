@@ -12,6 +12,7 @@ export function NewTodoForm({ onSubmit }) {
     function handleSubmit(e) {
         //Prevent the default behavior of the form "refreshing the page"
         e.preventDefault()
+        if (newItem === "") return
         //Add the new item to the list of todos
         onSubmit(newItem)
         setNewItem("")
