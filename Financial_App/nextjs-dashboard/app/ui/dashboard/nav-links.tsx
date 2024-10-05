@@ -20,8 +20,8 @@ type LinkType = {
 // Define the array of navigation links
 const links: LinkType[] = [
     { name: 'Home', href: '/', icon: HomeIcon },
-    { name: 'Customers', href: './customers', icon: UserGroupIcon },
-    { name: 'Invoices', href: './invoices', icon: DocumentDuplicateIcon },
+    { name: 'Customers', href: '../dashboard/customers', icon: UserGroupIcon },
+    { name: 'Invoices', href: '../dashboard/invoices', icon: DocumentDuplicateIcon },
 ];
 
 export default function NavLinks() {
