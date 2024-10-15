@@ -1,4 +1,5 @@
 'use server';
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import { z } from 'zod';
 import { sql } from '@vercel/postgres';
