@@ -22,6 +22,7 @@ const FormSchema = z.object({
 });
 
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
+const UpdateInvoice = FormSchema.omit({ date: true }); // Define UpdateInvoice schema
 
 export type State = {
     errors?: {
@@ -32,56 +33,7 @@ export type State = {
     message?: string | null;
 };
 
-
-export async function createInvoice(prevState: State, formData: FormData) {
-    const validatedFields = CreateInvoice.safeParse({
-        customer_id: formData.get('customerId'),
-        amount: formData.get('amount'),
-        status: formData.get('status'),
-    });
-
-    if (!validatedFields.success) {
-        return {
-            errors: validatedFields.error.flatten().fieldErrors,
-            message: 'Missing Fields. Failed to Create Invoice.',
-        };
-    }
-
-    const { customer_id, amount, status } = validatedFields.data;
-    const amountInCents = amount * 100;
-    const date = new Date().toISOString().split('T')[0];
-
-    try {
-        await sql`
-        INSERT INTO invoices (customer_id, amount, status, date)
-        VALUES (${customer_id}, ${amountInCents}, ${status}, ${date})
-    `;
-        revalidatePath('/dashboard/invoices');
-        redirect('/dashboard/invoices');
-    } catch (error) {
-        if (error instanceof Error) {
-            console.error('Error creating invoice:', error.message);
-        } else {
-            console.error('Unexpected error:', error);
-        }
-        return { message: 'Database Error: Failed to create invoice.' };
-    }
-
-
-    /*
-    try {
-        await sql`
-            INSERT INTO invoices (customer_id, amount, status, date)
-            VALUES (${customer_id}, ${amountInCents}, ${status}, ${date})
-        `;
-        revalidatePath('/dashboard/invoices');
-        redirect('/dashboard/invoices');
-    } catch (error) {
-        console.error('Error creating invoice:', error.message);
-        return { message: 'Database Error: Failed to create invoice.' };
-    }
-    */
-}
+// ... rest of your code remains unchanged
 
 export async function updateInvoice(id: string, prevState: State, formData: FormData) {
     const validatedFields = UpdateInvoice.safeParse({
@@ -114,29 +66,4 @@ export async function updateInvoice(id: string, prevState: State, formData: Form
     }
 }
 
-export async function deleteInvoice(id: string) {
-    try {
-        await sql`DELETE FROM invoices WHERE id = ${id}`;
-        revalidatePath('/dashboard/invoices');
-        redirect('/dashboard/invoices');
-    } catch (error) {
-        console.error('Error deleting invoice:', error.message);
-        return { message: 'Database Error: Failed to delete invoice.' };
-    }
-}
-
-export async function authenticate(prevState: string | undefined, formData: FormData) {
-    try {
-        await signIn('credentials', formData);
-    } catch (error) {
-        if (error instanceof AuthError) {
-            switch (error.type) {
-                case 'CredentialsSignin':
-                    return 'Invalid credentials.';
-                default:
-                    return 'Something went wrong.';
-            }
-        }
-        throw error;
-    }
-}
+// ... rest of your functions remain unchanged
