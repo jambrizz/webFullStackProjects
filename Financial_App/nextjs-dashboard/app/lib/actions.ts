@@ -53,6 +53,24 @@ export async function createInvoice(prevState: State, formData: FormData) {
 
     try {
         await sql`
+        INSERT INTO invoices (customer_id, amount, status, date)
+        VALUES (${customer_id}, ${amountInCents}, ${status}, ${date})
+    `;
+        revalidatePath('/dashboard/invoices');
+        redirect('/dashboard/invoices');
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error('Error creating invoice:', error.message);
+        } else {
+            console.error('Unexpected error:', error);
+        }
+        return { message: 'Database Error: Failed to create invoice.' };
+    }
+
+
+    /*
+    try {
+        await sql`
             INSERT INTO invoices (customer_id, amount, status, date)
             VALUES (${customer_id}, ${amountInCents}, ${status}, ${date})
         `;
@@ -62,6 +80,7 @@ export async function createInvoice(prevState: State, formData: FormData) {
         console.error('Error creating invoice:', error.message);
         return { message: 'Database Error: Failed to create invoice.' };
     }
+    */
 }
 
 export async function updateInvoice(id: string, prevState: State, formData: FormData) {
